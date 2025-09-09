@@ -1,0 +1,10 @@
+[repository]
+name = "contactlens"
+authors = ["Dregu"]
+#commit_pins = []
+
+[contactlens]
+description = "Soft monocle layout for Hyprland, fixes weird resizing behavior when cycling maximized windows in dwindle and master."
+authors = ["Dregu"]
+output = "libcontactlens.so"
+build = ["make"]
