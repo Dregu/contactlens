@@ -2,7 +2,7 @@
 
 #include <hyprland/src/Compositor.hpp>
 #include <hyprland/src/config/ConfigManager.hpp>
-#include <hyprland/src/desktop/Window.hpp>
+#include <hyprland/src/desktop/view/Window.hpp>
 #include <hyprland/src/plugins/PluginAPI.hpp>
 #define private public
 #include <hyprland/src/managers/LayoutManager.hpp>
@@ -36,18 +36,20 @@ void hkCalculateWorkspaceDwindle(CHyprDwindleLayout* thisptr, const PHLWORKSPACE
             *PFULLWINDOW->m_realSize     = PMONITOR->m_size;
         } else if (pWorkspace->m_fullscreenMode == FSMODE_MAXIMIZED) {
             for (auto& n : PLAYOUT->m_dwindleNodesData) {
-                if (n.workspaceID != pWorkspace->m_id)
+                if (n->workspaceID != pWorkspace->m_id)
                     continue;
 
-                SDwindleNodeData fakeNode;
-                fakeNode.pWindow        = n.pWindow;
-                fakeNode.box            = {PMONITOR->m_position + PMONITOR->m_reservedTopLeft, PMONITOR->m_size - PMONITOR->m_reservedTopLeft - PMONITOR->m_reservedBottomRight};
-                fakeNode.workspaceID    = pWorkspace->m_id;
-                PFULLWINDOW->m_position = fakeNode.box.pos();
-                PFULLWINDOW->m_size     = fakeNode.box.size();
-                fakeNode.ignoreFullscreenChecks = true;
+                SP<SDwindleNodeData> fakeNode = makeShared<SDwindleNodeData>();
+                fakeNode->self = fakeNode;
+                fakeNode->pWindow        = n->pWindow;
+                fakeNode->box            = PLAYOUT->workAreaOnWorkspace(pWorkspace);
+                fakeNode->workspaceID    = pWorkspace->m_id;
+                PFULLWINDOW->m_position = fakeNode->box.pos();
+                PFULLWINDOW->m_size     = fakeNode->box.size();
+                fakeNode->ignoreFullscreenChecks = true;
+                fakeNode->layout = PLAYOUT;
 
-                PLAYOUT->applyNodeDataToWindow(&fakeNode);
+                PLAYOUT->applyNodeDataToWindow(fakeNode);
             }
         }
     } else
@@ -74,8 +76,9 @@ void hkCalculateWorkspaceMaster(CHyprMasterLayout* thisptr, const PHLWORKSPACE& 
 
                 SMasterNodeData fakeNode;
                 fakeNode.pWindow                = n.pWindow;
-                fakeNode.position               = PMONITOR->m_position + PMONITOR->m_reservedTopLeft;
-                fakeNode.size                   = PMONITOR->m_size - PMONITOR->m_reservedTopLeft - PMONITOR->m_reservedBottomRight;
+                const auto WORKAREA             = PLAYOUT->workAreaOnWorkspace(pWorkspace);
+                fakeNode.position               = WORKAREA.pos();
+                fakeNode.size                   = WORKAREA.size();
                 fakeNode.workspaceID            = pWorkspace->m_id;
                 PFULLWINDOW->m_position         = fakeNode.position;
                 PFULLWINDOW->m_size             = fakeNode.size;
