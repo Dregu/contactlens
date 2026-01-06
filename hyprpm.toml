@@ -3,7 +3,7 @@ name = "contactlens"
 authors = ["Dregu"]
 commit_pins = [
   ["386376400119dd46a767c9f8c8791fd22c7b6e61", "32b525efb8ea8962866b8d66e6a84bf793b72744"], # 0.52.2
-  ["ab1d80f3d6aebd57a0971b53a1993b1c1dfe0b09", ""]  # 0.53.1
+  ["ab1d80f3d6aebd57a0971b53a1993b1c1dfe0b09", "6621f0fdb417aff79efeae4c42c945285cd88e09"]  # 0.53.1
 ]
 
 [contactlens]
